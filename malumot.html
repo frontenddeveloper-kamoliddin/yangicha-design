@@ -8,6 +8,23 @@
   <script src="https://cdn.tailwindcss.com"></script>
   
   <style>
+    .id-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #4a90e2, #6bb9f0);
+            border-bottom-left-radius: 100%;
+            z-index: 1;
+        }
+        .name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
     .batafsil-qarzdorliklar {
       max-height: 400px; 
       overflow-y: auto; 
@@ -19,20 +36,17 @@
       padding: 16px;     
     }
     body {
-      font-family: 'Arial', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      
-      background-color: #232b36;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #181f2a;
       margin: 0;
+      min-height: 100vh;
     }
     .stat-card {
       min-width: 220px;
       min-height: 140px;
-      border-radius: 22px;
+      border-radius: 24px;
       box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
-      padding: 32px 18px 24px 18px;
+      padding: 36px 20px 28px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -41,10 +55,11 @@
       font-weight: 600;
       margin-bottom: 0;
       margin-top: 0;
-      transition: transform 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1.5px solid rgba(255,255,255,0.08);
     }
     .stat-card:hover {
-      transform: translateY(-4px) scale(1.03);
+      transform: translateY(-6px) scale(1.04);
       box-shadow: 0 16px 40px 0 rgba(31, 38, 135, 0.22);
     }
     .stat-blue {
@@ -64,11 +79,12 @@
       color: #fff;
     }
     .stat-value {
-      font-size: 2.6rem;
+      font-size: 2.8rem;
       font-weight: bold;
-      margin-top: 10px;
+      margin-top: 12px;
       margin-bottom: 0;
-      letter-spacing: 1px;
+      letter-spacing: 1.5px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.10);
     }
     .chart-card {
       background: linear-gradient(135deg, #232b36 60%, #232b36 100%);
@@ -138,12 +154,31 @@
       transition: background 0.2s;
     }
     @media (max-width: 900px) {
-      .stat-card, .chart-card { min-width: 160px; min-height: 120px; padding: 18px 8px; }
+      .stat-card { min-width: 140px; min-height: 100px; padding: 16px 6px; }
       .stat-value { font-size: 1.5rem; }
       .chart-title { font-size: 1.1rem; }
       .debtors-table th, .debtors-table td { padding: 8px 6px; font-size: 0.98rem; }
       .debtors-table-card { padding: 16px 4px; }
     }
+    .id-number {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+        }
+        .id-card {
+            width: 300px;
+            height: 100px;
+            background: linear-gradient(135deg, #ffffff, #f0f0f0);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
   </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 min-h-screen">
@@ -169,7 +204,7 @@
       <button id="logoutBtn" class="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition">Chiqish</button>
       <button onclick="window.location.href='malumot.html'" class="w-full bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded transition">Bosh sahifa</button>
       <button onclick="window.location.href='mening-qarzlarim.html'"  class="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition">Mening qarizlarim</button>
-      <button onclick="window.location.href='qarzlarni-qidirish.html'" class="w-full bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded transition">Qarzlar ko‘rish</button>
+      <button onclick="window.location.href='qarzlarni-qidirish.html'" class="w-full bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded transition">Profile qo'shish</button>
       <button onclick="window.location.href='dashboard.html'" class="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition">Qarz qoshish</button>
       
     </div>
@@ -179,9 +214,10 @@
 
   <div class="min-h-screen flex flex-col items-center justify-start pt-6">
 
-    <div class="w-full max-w-3xl flex items-center justify-between  mb-6 px-4">
-      <button id="openSidebar" class="text-2xl text-gray-700 dark:text-gray-200">&#9776;</button>
-      <h2 class="text-2xl text-[white] font-bold text-center flex-1">Qarzdorlar Dashboard</h2>
+    <div class="w-full max-w-5xl flex items-center justify-between mb-8 px-4">
+      <button id="openSidebar" class="text-3xl text-gray-200 hover:text-white focus:outline-none transition">&#9776;</button>
+      <h2 class="text-3xl font-bold text-white text-center flex-1" style="letter-spacing:1px;">Qarzdorlar Dashboard</h2>
+      <div style="width:40px;"></div>
     </div>
     <div class="w-full max-w-5xl flex flex-col md:flex-row gap-6 mb-6 px-4">
       <div class="flex-1 stat-card stat-blue text-center">

@@ -45,12 +45,16 @@ onAuthStateChanged(auth, (user) => {
 // Sidebar functionality
 const sidebar = document.getElementById("sidebar");
 const sidebarOverlay = document.getElementById("sidebarOverlay");
-document.getElementById("openSidebar").onclick = () => {
-  sidebar.classList.remove("-translate-x-full");
-  sidebarOverlay.classList.remove("hidden");
-};
-document.getElementById("closeSidebar").onclick = closeSidebar;
-sidebarOverlay.onclick = closeSidebar;
+if (document.getElementById("openSidebar")) {
+  document.getElementById("openSidebar").onclick = () => {
+    sidebar.classList.remove("-translate-x-full");
+    sidebarOverlay.classList.remove("hidden");
+  };
+}
+if (document.getElementById("closeSidebar")) {
+  document.getElementById("closeSidebar").onclick = closeSidebar;
+}
+if (sidebarOverlay) sidebarOverlay.onclick = closeSidebar;
 
 function closeSidebar() {
   sidebar.classList.add("-translate-x-full");
@@ -58,9 +62,11 @@ function closeSidebar() {
 }
 
 // Logout functionality
-document.getElementById("logoutBtn").onclick = () => {
-  signOut(auth).then(() => (window.location.href = "index.html"));
-};
+if (document.getElementById("logoutBtn")) {
+  document.getElementById("logoutBtn").onclick = () => {
+    signOut(auth).then(() => (window.location.href = "index.html"));
+  };
+}
 
 // Debtor management
 const debtorForm = document.getElementById("debtorForm");
@@ -74,77 +80,83 @@ function generateUniqueCode() {
   return code;
 }
 
-debtorForm.onsubmit = async (e) => {
-  e.preventDefault();
-  const name = document.getElementById("debtorName").value.trim();
-  const product = document.getElementById("debtorProduct").value.trim();
-  let count = parseInt(document.getElementById("debtorCount").value);
-  let price = parseInt(document.getElementById("debtorPrice").value);
-  const note = document.getElementById("debtorNote").value.trim();
-  
-  if (!name || !price) return;
+if (debtorForm) {
+  debtorForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("debtorName").value.trim();
+    const product = document.getElementById("debtorProduct").value.trim();
+    let count = parseInt(document.getElementById("debtorCount").value);
+    let price = parseInt(document.getElementById("debtorPrice").value);
+    const note = document.getElementById("debtorNote").value.trim();
+    
+    if (!name || !price) return;
 
-  price = price * 1;
-  let amount;
-  
-  if (!count || count <= 0) {
-    count = 1;
-    amount = price;
-  } else {
-    amount = count * price;
-  }
+    price = price * 1;
+    let amount;
+    
+    if (!count || count <= 0) {
+      count = 1;
+      amount = price;
+    } else {
+      amount = count * price;
+    }
 
-  if (price <= 0) {
-    price = 1;
-    amount = price;
-  }
+    if (price <= 0) {
+      price = 1;
+      amount = price;
+    }
 
-  const user = auth.currentUser;
-  if (!user) return;
+    const user = auth.currentUser;
+    if (!user) return;
 
-  const snapshot = await getDocs(collection(db, "debtors"));
-  const exists = snapshot.docs.some((doc) => {
-    const data = doc.data();
-    return (
-      data.userId === user.uid && data.name.toLowerCase() === name.toLowerCase()
-    );
-  });
-  
-  if (exists) {
-    alert("Bu ismli qarzdor allaqachon mavjud!");
-    return;
-  }
+    const snapshot = await getDocs(collection(db, "debtors"));
+    const exists = snapshot.docs.some((doc) => {
+      const data = doc.data();
+      return (
+        data.userId === user.uid && data.name.toLowerCase() === name.toLowerCase()
+      );
+    });
+    
+    if (exists) {
+      alert("Bu ismli qarzdor allaqachon mavjud!");
+      return;
+    }
 
-  const existingCodes = snapshot.docs.map(doc => doc.data().code).filter(Boolean);
-  const code = generateUniqueCode();
+    const existingCodes = snapshot.docs.map(doc => doc.data().code).filter(Boolean);
+    const code = generateUniqueCode();
 
-  await addDoc(collection(db, "debtors"), {
-    name,
-    product,
-    count,
-    price,
-    note,
-    userId: user.uid,
-    code,
-    history: [
-      {
-        type: "add",
-        amount,
-        count,
-        price,
-        product,
-        note,
-        date: Timestamp.now(),
-      },
-    ],
-  });
-  
-  debtorForm.reset();
-  loadDebtors();
-};
+    await addDoc(collection(db, "debtors"), {
+      name,
+      product,
+      count,
+      price,
+      note,
+      userId: user.uid,
+      code,
+      history: [
+        {
+          type: "add",
+          amount,
+          count,
+          price,
+          product,
+          note,
+          date: Timestamp.now(),
+        },
+      ],
+    });
+    
+    debtorForm.reset();
+    loadDebtors();
+  };
+}
 
 // Load and render debtors
-document.getElementById("searchInput").oninput = loadDebtors;
+const searchInput = document.getElementById("searchInput");
+if (searchInput) {
+  // faqat mavjud bo‘lsa ishlat
+  searchInput.oninput = loadDebtors;
+}
 
 async function loadDebtors() {
   const user = auth.currentUser;
@@ -275,8 +287,10 @@ function confirmDeleteDebtor(id, name) {
 // Debtor modal functionality
 const debtorModal = document.getElementById("debtorModal");
 const modalContent = document.getElementById("modalContent");
-document.getElementById("closeModal").onclick = () =>
-  debtorModal.classList.add("hidden");
+if (document.getElementById("closeModal")) {
+  document.getElementById("closeModal").onclick = () =>
+    debtorModal.classList.add("hidden");
+}
 
 function openDebtorModal(debtor) {
   debtorModal.classList.remove("hidden");
@@ -350,87 +364,89 @@ function openDebtorModal(debtor) {
     </div>
   `;
 
-  modalContent.querySelector("#addDebtForm").onsubmit = async (e) => {
-    e.preventDefault();
-    if (!(await showConfirmDiv("Qo‘shaveraymi?"))) return;
-    
-    Array.from(e.target.elements).forEach(el => {
-      if (el.tagName === "INPUT" || el.tagName === "BUTTON") el.style.display = "none";
-    });
-    
-    const product = e.target[0].value.trim();
-    let count = parseInt(e.target[1].value);
-    let price = parseInt(e.target[2].value);
-    const note = e.target[3].value.trim();
-
-    price = price * 1;
-    let amount;
-    
-    if (!count || count <= 0) {
-      count = 1;
-      amount = price;
-    } else {
-      amount = count * price;
-    }
-
-    if (price <= 0) {
-      price = 1;
-      amount = price;
-    }
-
-    if (!price) return;
-
-    const ref = doc(db, "debtors", debtor.id);
-    await updateDoc(ref, {
-      history: arrayUnion({
-        type: "add",
-        amount,
-        count,
-        price,
-        product,
-        note,
-        date: Timestamp.now(),
-      }),
-    });
-    
-    const updated = (await getDocs(collection(db, "debtors"))).docs
-      .find((docu) => docu.id === debtor.id)
-      .data();
+  if (modalContent) {
+    modalContent.querySelector("#addDebtForm").onsubmit = async (e) => {
+      e.preventDefault();
+      if (!(await showConfirmDiv("Qo‘shaveraymi?"))) return;
       
-    openDebtorModal({ ...updated, id: debtor.id });
-    loadDebtors();
-  };
-  
-  modalContent.querySelector("#subDebtForm").onsubmit = async (e) => {
-    e.preventDefault();
-    if (!(await showConfirmDiv("Ayiraveraymi?"))) return;
-    
-    Array.from(e.target.elements).forEach(el => {
-      if (el.tagName === "INPUT" || el.tagName === "BUTTON") el.style.display = "none";
-    });
-    
-    const val = parseInt(e.target[0].value);
-    const note = e.target[1].value.trim();
-    
-    if (!val) return;
-    
-    const ref = doc(db, "debtors", debtor.id);
-    await updateDoc(ref, {
-      history: arrayUnion({
-        type: "sub",
-        amount: val,
-        note,
-        date: Timestamp.now(),
-      }),
-    });
-    
-    const updated = (await getDocs(collection(db, "debtors"))).docs
-      .find((docu) => docu.id === debtor.id)
-      .data();
+      Array.from(e.target.elements).forEach(el => {
+        if (el.tagName === "INPUT" || el.tagName === "BUTTON") el.style.display = "none";
+      });
       
-    openDebtorModal({ ...updated, id: debtor.id });
-    loadDebtors();
-  };
+      const product = e.target[0].value.trim();
+      let count = parseInt(e.target[1].value);
+      let price = parseInt(e.target[2].value);
+      const note = e.target[3].value.trim();
+
+      price = price * 1;
+      let amount;
+      
+      if (!count || count <= 0) {
+        count = 1;
+        amount = price;
+      } else {
+        amount = count * price;
+      }
+
+      if (price <= 0) {
+        price = 1;
+        amount = price;
+      }
+
+      if (!price) return;
+
+      const ref = doc(db, "debtors", debtor.id);
+      await updateDoc(ref, {
+        history: arrayUnion({
+          type: "add",
+          amount,
+          count,
+          price,
+          product,
+          note,
+          date: Timestamp.now(),
+        }),
+      });
+      
+      const updated = (await getDocs(collection(db, "debtors"))).docs
+        .find((docu) => docu.id === debtor.id)
+        .data();
+        
+      openDebtorModal({ ...updated, id: debtor.id });
+      loadDebtors();
+    };
+    
+    modalContent.querySelector("#subDebtForm").onsubmit = async (e) => {
+      e.preventDefault();
+      if (!(await showConfirmDiv("Ayiraveraymi?"))) return;
+      
+      Array.from(e.target.elements).forEach(el => {
+        if (el.tagName === "INPUT" || el.tagName === "BUTTON") el.style.display = "none";
+      });
+      
+      const val = parseInt(e.target[0].value);
+      const note = e.target[1].value.trim();
+      
+      if (!val) return;
+      
+      const ref = doc(db, "debtors", debtor.id);
+      await updateDoc(ref, {
+        history: arrayUnion({
+          type: "sub",
+          amount: val,
+          note,
+          date: Timestamp.now(),
+        }),
+      });
+      
+      const updated = (await getDocs(collection(db, "debtors"))).docs
+        .find((docu) => docu.id === debtor.id)
+        .data();
+        
+      openDebtorModal({ ...updated, id: debtor.id });
+      loadDebtors();
+    };
+  }
 }
 
 // Custom confirm dialog
@@ -479,4 +495,74 @@ async function loadUserInfo() {
       document.getElementById("userCode").innerText = "ID: " + data.code;
     }
   }
+}
+
+
+
+
+// Foydalanuvchilarni ism yoki ID bo‘yicha qidirish
+const searchInputByNameOrId = document.getElementById('searchByNameOrIdInput');
+const searchResult = document.getElementById('searchByCodeResult');
+
+if (searchInputByNameOrId && searchResult) {
+  searchInputByNameOrId.addEventListener('input', async function () {
+    const searchValue = this.value.trim().toLowerCase();
+    searchResult.innerHTML = '';
+    if (!searchValue) return;
+
+    // Foydalanuvchilarni Firestore'dan olish
+    const usersSnapshot = await getDocs(collection(db, "users"));
+    const users = [];
+    usersSnapshot.forEach(doc => {
+      const data = doc.data();
+      users.push({
+        id: doc.id,
+        name: data.name || '',
+        code: data.code || '',
+      });
+    });
+
+    // Qidiruv bo‘yicha filtrlash
+    const filtered = users.filter(user =>
+      user.name.toLowerCase().includes(searchValue) ||
+      user.code.toLowerCase().includes(searchValue)
+    );
+
+    if (filtered.length === 0) {
+      searchResult.innerHTML = '<div class="text-gray-400 mt-2">Foydalanuvchi topilmadi</div>';
+      return;
+    }
+
+    filtered.forEach(user => {
+      // Avatardan faqat bosh harflar olinadi
+      const initials = user.name
+        .split(' ')
+        .map(w => w[0]?.toUpperCase() || '')
+        .join('')
+        .slice(0, 2);
+
+      const card = document.createElement('div');
+      card.className = 'flex items-center gap-4 bg-gray-800 rounded-xl shadow-lg p-4 my-2 w-full max-w-2xl';
+
+      card.innerHTML = `
+        <div class="flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 text-white text-2xl font-bold">${initials}</div>
+        <div class="flex-1">
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-lg text-white">${user.name}</span>
+            <span class="text-xs text-gray-300 font-mono">#${user.code.slice(-3)}</span>
+            <span class="ml-2 flex items-center bg-yellow-400 text-white text-sm font-semibold px-2 py-1 rounded-full"><svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.561-.955L10 0l2.951 5.955 6.561.955-4.756 4.635 1.122 6.545z"/></svg>4.5</span>
+          </div>
+          <div class="text-xs text-gray-400 mt-1">ID: <span class="font-mono">${user.code}</span></div>
+        </div>
+        <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded font-semibold transition">Qo‘shish</button>
+      `;
+
+      card.querySelector('button').onclick = () => {
+        alert(`${user.name} (${user.code}) qo‘shildi!`);
+        // Bu yerda kerakli funksiyani chaqirishingiz mumkin
+      };
+
+      searchResult.appendChild(card);
+    });
+  });
 }
