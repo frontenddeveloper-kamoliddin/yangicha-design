@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+  <link rel="shortcut icon" href="./img/ChatGPT Image Jun 30, 2025, 01_04_34 PM.png" type="image/x-icon">
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    .batafsil-qarzdorliklar {
+      max-height: 400px; 
+      overflow-y: auto; 
+    }
+   
+    .batafsil-modal {
+      max-height: 70vh;   
+      overflow-y: auto;   
+      padding: 16px;     
+    }
+    body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+        
+        .id-card {
+            width: 300px;
+            height: 100px;
+            background: linear-gradient(135deg, #ffffff, #f0f0f0);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .id-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #4a90e2, #6bb9f0);
+            border-bottom-left-radius: 100%;
+            z-index: 1;
+        }
+        
+        
+        
+        .content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .id-number {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        
+        .id-label {
+            font-size: 12px;
+            color: #95a5a6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 3px;
+        }
+        
+       
+  </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 min-h-screen">
+
+  <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-lg z-30 transform -translate-x-full transition-transform duration-300">
+    <div class="flex items-center justify-between p-4 border-b dark:border-gray-700">
+      <div class="id-card">
+        
+        <div class="content">
+            <div id="userName" class="name"></div>
+            
+            <div id="userCode" class="id-number"></div>
+        </div>
+        
+    </div>
+      <div>
+        <span  class="font-bold text-lg"></span>
+        <span id="userCode" class="text-xs text-gray-400 ml-2"></span>
+      </div>
+      <button id="closeSidebar" class="text-gray-500 hover:text-red-500">&times;</button>
+    </div>
+    <div class="p-4 space-y-4">
+      <button id="logoutBtn" class="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition">Chiqish</button>
+      <button onclick="window.location.href='malumot.html'" class="w-full bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded transition">Bosh sahifa</button>
+      <button onclick="window.location.href='mening-qarzlarim.html'"  class="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition">Mening qarizlarim</button>
+      <button onclick="window.location.href='qarzlarni-qidirish.html'" class="w-full bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded transition">Qarzlar ko‘rish</button>
+      <button onclick="window.location.href='dashboard.html'" class="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition">Qarz qoshish</button>
+      
+    </div>
+  </div>
+ 
+  <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-40 z-20 hidden"></div>
+
+  <div class="min-h-screen flex flex-col items-center justify-start pt-6">
+
+    <div class="w-full max-w-3xl flex items-center justify-between mb-6 px-4">
+      <button id="openSidebar" class="text-2xl text-gray-700 dark:text-gray-200">&#9776;</button>
+      <h2 class="text-2xl text-[white] font-bold text-center flex-1">Qarzdorlar Dashboard</h2>
+    </div>
+
+    <div class="w-full max-w-3xl mb-4 px-4">
+      <input id="searchInput" type="text" placeholder="Qarzdorni qidiring..." class="w-full p-3 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 dark:text-gray-100">
+    </div>
+
+    <div id="userInfo" class="mb-4 text-center">
+      <div id="userName" class="font-bold"></div>
+      <div id="userCode" class="text-xs text-gray-400"></div>
+    </div>
+
+    <form id="debtorForm" class="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-6 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input id="debtorName" type="text" placeholder="Ism" required class="p-3 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 dark:text-gray-100">
+        <input id="debtorProduct" type="text" placeholder="Mahsulot nomi"  class="p-3 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 dark:text-gray-100">
+        <input id="debtorCount" type="number" minlength=""  placeholder="Mahsulot soni"  class="p-3 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 dark:text-gray-100">
+        <input id="debtorPrice" type="number" min="1" placeholder="Mahsulot narxi" required class="p-3 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 dark:text-gray-100">
+      </div>
+      
+      <input id="debtorNote" type="text" placeholder="Qo'shimcha izoh (ixtiyoriy)" class="w-full p-3 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 dark:text-gray-100">
+      <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition">Qarzdor qo'shish</button>
+    </form>
+
+    <div class="w-full max-w-3xl flex flex-col md:flex-row gap-4 mb-4 px-4">
+      <div class="flex-1 bg-blue-100 dark:bg-blue-900 rounded-lg p-4 text-center">
+        <div class="text-lg font-bold">Umumiy qo‘shilgan</div>
+        <div id="totalAdded" class="text-2xl font-bold mt-2">0 so‘m</div>
+      </div>
+      <div class="flex-1 bg-red-100 dark:bg-red-900 rounded-lg p-4 text-center">
+        <div class="text-lg font-bold">Umumiy ayirilgan</div>
+        <div id="totalSubtracted" class="text-2xl font-bold mt-2">0 so‘m</div>
+      </div>
+      <div class="flex-1 bg-green-100 dark:bg-green-900 rounded-lg p-4 text-center">
+        <div class="text-lg font-bold">Umumiy qarzdorlik</div>
+        <div id="totalDebt" class="text-2xl font-bold mt-2">0 so‘m</div>
+      </div>
+      
+    </div>
+
+    <!-- Chartlar uchun joy -->
+    
+    <div id="debtorsList" class="w-full max-w-3xl space-y-4 px-4 mb-10"></div>
+    <div class="batafsil-qarzdorliklar">
+   
+    </div>
+  </div>
+ 
+  <div id="debtorModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-2xl p-6 relative batafsil-modal">
+      <button id="closeModal" class="absolute top-2 right-2 text-2xl text-gray-500 hover:text-red-500">&times;</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+  <div id="myDebtsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-lg p-6 relative batafsil-modal">
+      <button id="closeMyDebtsModal" class="absolute top-2 right-2 text-2xl text-gray-500 hover:text-red-500">&times;</button>
+      <h3 class="text-xl font-bold mb-4 text-center">Mening qarizlarim</h3>
+      <form id="myDebtForm" class="space-y-3 mb-4">
+        <input id="creditorName" type="text" placeholder="Qariz bergan inson" required class="w-full p-3 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100">
+        <input id="creditorAmount" type="number" min="1" placeholder="Summa" required class="w-full p-3 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100">
+        <input id="creditorNote" type="text" placeholder="Izoh (ixtiyoriy)" class="w-full p-3 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100">
+        <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition">Qarzdorlik qo'shish</button>
+      </form>
+      <div id="myDebtsList" class="space-y-3"></div>
+    </div>
+  </div>
+  <!-- Qarzlar ko‘rish modal -->
+  <div id="viewDebtsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-lg p-6 relative batafsil-modal">
+      <button id="closeViewDebtsModal" class="absolute top-2 right-2 text-2xl text-gray-500 hover:text-red-500">&times;</button>
+      <h3 class="text-xl font-bold mb-4 text-center">Qarzlarni kod orqali qidirish</h3>
+      <input id="searchByCodeInput" type="text" maxlength="8" placeholder="Qarzdor kodi (masalan: A1B2C3D4)" class="w-full p-3 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100 mb-4">
+      <!-- Kod orqali qidirish inputidan keyin joylashtiring -->
+      <div id="searchedCodesWrap" class="flex flex-wrap mt-2"></div>
+      <div id="searchByCodeResult"></div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="dashboard.js"></script>
+</body>
+</html>
